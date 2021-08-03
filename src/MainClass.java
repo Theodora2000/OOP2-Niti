@@ -1,14 +1,67 @@
 class MojaNit extends Thread{
+    private int suma;
     public void run(){
-        for(int i=0;i<100;i+=2){
-            System.out.println(i);
+        int s=0;
+        for(int i=0;i<100 && !interrupted();i+=2){
+            s+=i;
+        }
+        suma=s;
+    }
+
+    public int getSuma() {
+        return suma;
+    }
+
+}
+class IncThread extends Thread{
+private Brojac brojac;
+
+    public IncThread(Brojac brojac) {
+        this.brojac = brojac;
+    }
+
+    public void run(){
+        for(int i=0;i<1000000;i++){
+            brojac.inc();
         }
     }
 }
-public class MainClass {
+class Brojac{
 
-    public static void main(String args[]){
-        Thread t = new MojaNit();
+    private int br=0;
+    private Object o = new Object();
+    public void inc(){
+        synchronized (o){
+            br++;
+        }//zakljucava objekat
+
+    }
+    public int getBr(){
+        synchronized (o) {
+            return br;
+        }
+    }
+
+}
+
+
+public class MainClass {
+    public static void main(String args[]) throws InterruptedException  {
+        Brojac br = new Brojac();
+        Thread t1= new IncThread(br);
+        t1.start();
+        Thread t2= new IncThread(br);
+        t2.start();
+        Thread t3= new IncThread(br);
+        t3.start();
+        t1.join();
+        t2.join();
+        t3.join();
+        System.out.println(br.getBr());
+    }
+
+    public static void main1(String args[]) throws InterruptedException{
+        MojaNit t = new MojaNit();
         //t.run();
         //niti su predstavljenje objektima klase thread
         //KORISNICKE niti obavljaju nsto za korisnika
@@ -17,10 +70,15 @@ public class MainClass {
         //kod niti prvo definisiemo tip
 
         t.start();
+
         //ako imamo dva jezgra onda se izvrsava sve paralelno
         for(int i=1;i<100;i+=2){
             System.out.println(i);
         }
-        throw new NullPointerException();
+        t.interrupt();
+        t.join();
+        System.out.println(t.getSuma());
+        //skedzule je kod 1 jezra, daje iluziju da se stvari izvravaju paralelno
+
     }
 }
