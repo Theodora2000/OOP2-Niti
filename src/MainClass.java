@@ -29,15 +29,15 @@ private Brojac brojac;
 class Brojac{
 
     private int br=0;
-    private Object o = new Object();
+
     public void inc(){
-        synchronized (o){//synchronized nas stiti od kvaranje nase strukture
+        synchronized (this){//synchronized nas stiti od kvaranje nase strukture
             br++;
         }//zakljucava objekat
 
     }
     public int getBr(){
-        synchronized (o) {
+        synchronized (this) {
             return br;
         }
     }
